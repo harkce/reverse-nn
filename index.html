@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/map.css">
+  </head>
+  <body>
+    <div class="row">
+      <div class="col-md-9">  
+        <div id="map"></div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <button id="load">Load</button><button id="save" onclick="save()">Save</button><button id="reset">Reset</button>
+          <h4>Point</h4>
+          <button id="addpoint" onclick="modeAddPoint()">Add</button>
+        </div>
+
+        <div class="row">
+          <h4>Path</h4>
+          <span id="addpath" hidden>
+            <select name="pathfrom" id="pathfrom">
+              <option value="">- From -</option>
+            </select>
+            <select name="pathto" id="pathto">
+              <option value="">- To -</option>
+            </select>
+            <button id="addpath" onclick="addPath()">Add Path</button>
+          </span>
+          <button id="modepath" onclick="modeAddPath()">Add</button>
+        </div>
+
+        <div class="row">
+          <h4>Object</h4>
+          <span id="addobject" hidden>
+            <select name="selectobject" id="selectobject">
+              <option value="">- Object -</option>
+            </select>
+            <button id="addobject" onclick="addObject()">Add Object</button>
+          </span>
+          <button id="modeobject" onclick="modeAddObject()">Add</button>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="js/map.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAL-wqK798ovCa7csBBTWgSq4tUhshpxPY&callback=initMap"
+    async defer></script>
+  </body>
+</html>
