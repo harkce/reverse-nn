@@ -1,8 +1,8 @@
 var map;
 var mode = "idle";
 var points = [];
-var paths = [];
 var objects = [];
+var paths = [];
 var markers = [];
 var lines = [];
 var idcount = 0;
@@ -45,6 +45,11 @@ function addMarker(location, map) {
 	}));
 
 	$('#selectobject').append($('<option>', {
+		value: idcount,
+		text: txt
+	}));
+
+	$('#facility').append($('<option>', {
 		value: idcount,
 		text: txt
 	}));
@@ -94,6 +99,8 @@ function addPath() {
 			strokeWeight: 2
 		});
 
+		lines.push(path);
+
 		path.setMap(map);
 	}
 }
@@ -115,14 +122,17 @@ function getPoint(id) {
 			return points[i];
 		}
 	}
+	return 0;
 }
 
 function addObject() {
 	var value = $('#selectobject').val();
 	var marker = getMarker(value);
+	var point = getPoint(value);
 	if (mode == "addobject" && marker != 0) {
 		$("#selectobject option[value='" + value + "']").remove();
 		marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+		point.type = "object";
 		objects.push({id: marker.id, label: marker.label, lat: marker.position.lat(), lng: marker.position.lng()});
 	}
 }
@@ -170,7 +180,6 @@ function modeAddObject() {
 function save() {
 	var pts = {points: points};
 	var pth = {paths: paths};
-	var obj = {objects: objects};
 	$.ajax({
 		type: "POST",
 		url: "server.php",
@@ -178,7 +187,6 @@ function save() {
 			type: 'save',
 			point: JSON.stringify(pts),
 			path: JSON.stringify(pth),
-			object: JSON.stringify(obj)
 		},
 		success: function(data) {
 			alert("Save success");
@@ -188,9 +196,130 @@ function save() {
 }
 
 function load() {
+	reset();
+	var pts;
+	$.ajax({
+		type: "GET",
+		url: "data/points.json",
+		success: function(data) {
+			pts = data.points;
+		},
+		async: false
+	});
+	for (var i = 0; i < pts.length; i++) {
+		idcount++;
+		labelcount++;
+		var marker = new google.maps.Marker({
+			id: pts[i].id,
+			position: {lat: pts[i].lat, lng: pts[i].lng},
+			label: pts[i].label,
+			map: map
+		});
+		markers.push(marker);
+		points.push({id: pts[i].id, label: pts[i].label, lat: pts[i].lat, lng: pts[i].lng, type: pts[i].type});
+		$('#pathfrom').append($('<option>', {
+			value: "(" + pts[i].lat + ", " + pts[i].lng + ")",
+			text: pts[i].label
+		}));
 
+		$('#pathto').append($('<option>', {
+			value: "(" + pts[i].lat + ", " + pts[i].lng + ")",
+			text: pts[i].label
+		}));
+
+		$('#selectobject').append($('<option>', {
+			value: pts[i].id,
+			text: pts[i].label
+		}));
+
+		$('#facility').append($('<option>', {
+			value: pts[i].id,
+			text: pts[i].label
+		}));
+
+		if (pts[i].type === "object") {
+			var value = pts[i].id;
+			var marker = getMarker(value);
+			var point = getPoint(value);
+			if (marker != 0) {
+				$("#selectobject option[value='" + value + "']").remove();
+				marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png');
+				point.type = "object";
+				objects.push({id: marker.id, label: marker.label, lat: marker.position.lat(), lng: marker.position.lng()});
+			}
+		}
+	}
+
+	var pth;
+	$.ajax({
+		type: "GET",
+		url: "data/paths.json",
+		success: function(data) {
+			pth = data.paths;
+		},
+		async: false
+	});
+	for (var i = 0; i < pth.length; i++) {
+		var distance = pth[i].distance;
+		var coord = pth[i].path;
+
+		var info = {
+			path: coord,
+			distance: distance
+		};
+
+		paths.push(info);
+
+		var path = new google.maps.Polyline({
+			path: coord,
+			geodesic: true,
+			strokeColor: '#FF0000',
+			strokeOpacity: 1.0,
+			strokeWeight: 2
+		});
+
+		lines.push(path);
+
+		path.setMap(map);
+	}
 }
 
 function reset() {
-
+	idcount = 0;
+	labelcount = 65;
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setMap(null);
+	}
+	for (var i = 0; i < lines.length; i++) {
+		lines[i].setMap(null);
+	}
+	$('#pathfrom')
+		.find('option')
+		.remove()
+		.end()
+		.append('<option value="">- From -</option>')
+		.val('');
+	$('#pathto')
+		.find('option')
+		.remove()
+		.end()
+		.append('<option value="">- To -</option>')
+		.val('');
+	$('#selectobject')
+		.find('option')
+		.remove()
+		.end()
+		.append('<option value="">- Object -</option>')
+		.val('');
+	$('#facility')
+		.find('option')
+		.remove()
+		.end()
+		.append('<option value="">- Facility -</option>')
+		.val('');
+	points = [];
+	objects = [];
+	paths = [];
+	markers = [];
+	lines = [];
 }
