@@ -128,16 +128,16 @@ function findNearest(objects){
 	return allDistance
 }
 
-function main(facillity, objects) {
+function main(facility, objects) {
 	let allObjects = objects
-	allObjects.push(facillity)	
+	allObjects.push(facility)	
 
 	let nearest = findNearest(allObjects),
 		nearestLength = nearest.length,
 		reverseNN = []
 
 	for (var i = 0; i < nearestLength; i++) {
-		if (nearest[i].nearest == facillity) {
+		if (nearest[i].nearest == facility) {
 			reverseNN.push(nearest[i].origin)
 		}
 	}
@@ -313,7 +313,7 @@ function main(facillity, objects) {
 // 	}
 // ]
 
-// let facillity = {"id":1,"label":"A","lat":-6.974042980393057,"lng":107.6306962966919}
+// let facility = {"id":1,"label":"A","lat":-6.974042980393057,"lng":107.6306962966919}
 
 var head = document.querySelector(".modal-header").innerHTML
 var body = document.querySelector(".modal-body").innerHTML
@@ -321,13 +321,19 @@ var body = document.querySelector(".modal-body").innerHTML
 function call_main() {
 	document.querySelector(".modal-header").innerHTML = head
 	document.querySelector(".modal-body").innerHTML = ""
-	var facillity = getPoint($('#facility').val());
-	let nnObjects = main(facillity, objects)
+	let objs = objects.slice()
+	for (var i = 0; i < objs.length; i++) {
+		if (objs[i].id == $('#facility').val()) {
+			objs.splice(i, 1)
+		} 
+	}
+	let facility = getPoint($('#facility').val())
+	let nnObjects = main(facility, objs)
 	var htmlData = ""
 	for (var i = 0; i < nnObjects.length; i++) {
 		htmlData += "<h3>" + nnObjects[i].label + "</h3><br>"
 	}
-	document.querySelector(".modal-header").innerHTML += facillity.label
+	document.querySelector(".modal-header").innerHTML += facility.label
 	document.querySelector(".modal-body").innerHTML = htmlData
 }
 
@@ -356,11 +362,11 @@ function call_main() {
 // ];
 
 //reverse NN object
-// let facillity = {
+// let facility = {
 // 	name: 'X',
 // 	x: 1,
 // 	y: 1
 
 // }
 
-// main(facillity, objects)
+// main(facility, objects)
