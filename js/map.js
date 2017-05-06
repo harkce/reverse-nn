@@ -48,11 +48,6 @@ function addMarker(location, map) {
 		value: idcount,
 		text: txt
 	}));
-
-	$('#facility').append($('<option>', {
-		value: idcount,
-		text: txt
-	}));
 }
 
 function toRad(degrees) {
@@ -135,6 +130,11 @@ function addObject() {
 		point.type = "object";
 		objects.push({id: marker.id, label: marker.label, lat: marker.position.lat(), lng: marker.position.lng()});
 	}
+
+	$('#facility').append($('<option>', {
+		value: value,
+		text: point.label
+	}));
 }
 
 function getLatLng(str) {
@@ -232,11 +232,6 @@ function load() {
 			text: pts[i].label
 		}));
 
-		$('#facility').append($('<option>', {
-			value: pts[i].id,
-			text: pts[i].label
-		}));
-
 		if (pts[i].type === "object") {
 			var value = pts[i].id;
 			var marker = getMarker(value);
@@ -247,6 +242,10 @@ function load() {
 				point.type = "object";
 				objects.push({id: marker.id, label: marker.label, lat: marker.position.lat(), lng: marker.position.lng()});
 			}
+			$('#facility').append($('<option>', {
+				value: pts[i].id,
+				text: pts[i].label
+			}));
 		}
 	}
 
